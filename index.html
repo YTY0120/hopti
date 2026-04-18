@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中文说唱人格测试</title>
+  <style>
+    :root {
+      --bg: #f5f8f4;
+      --panel: #ffffff;
+      --text: #19231c;
+      --muted: #66756b;
+      --line: #d6e3d8;
+      --soft: #eef5ef;
+      --accent: #628468;
+      --accent-strong: #47614c;
+      --shadow: 0 16px 40px rgba(47, 73, 55, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at top left, #fbfffb 0, #f5f8f4 38%, #eff5f0 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .hero {
+      min-height: 48vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 42px 24px;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -58px;
+      top: -58px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(127, 165, 134, 0.18), rgba(127, 165, 134, 0.02));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      max-width: 760px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero .sub {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.85;
+      max-width: 760px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
+      text-align: left;
+    }
+
+    .mini-panel {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfefb, #f3f8f4);
+    }
+
+    .mini-panel h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .mini-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+      font: inherit;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+
+    .btn-primary {
+      background: var(--accent-strong);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(77, 106, 83, 0.18);
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent-strong);
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .test-wrap,
+    .result-wrap {
+      margin-top: 22px;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      flex: 1;
+      min-width: 240px;
+      height: 10px;
+      background: #edf3ee;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #97b59c, #5b7a62);
+      border-radius: inherit;
+      transition: width .22s ease;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .question-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .question-title {
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+
+    .option:hover {
+      border-color: #bcd0c1;
+      background: #f8fcf9;
+    }
+
+    .option input {
+      margin-top: 3px;
+      accent-color: var(--accent-strong);
+      transform: scale(1.1);
+      flex-shrink: 0;
+    }
+
+    .option-code {
+      font-weight: 800;
+      color: var(--accent-strong);
+      min-width: 22px;
+    }
+
+    .actions-bottom,
+    .result-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .result-layout {
+      display: grid;
+      gap: 18px;
+    }
+
+    .result-top {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .poster-box,
+    .type-box,
+    .analysis-box,
+    .dim-box,
+    .top3-box,
+    .note-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+
+    .poster-box {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 320px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(127, 165, 134, 0.16), rgba(127, 165, 134, 0) 40%),
+        linear-gradient(180deg, #ffffff, #f7fbf8);
+    }
+
+    .poster-box::after {
+      content: "";
+      position: absolute;
+      right: -46px;
+      bottom: -46px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(127, 165, 134, 0.12), rgba(127, 165, 134, 0.01));
+      pointer-events: none;
+    }
+
+    .poster-image {
+      width: 100%;
+      min-height: 240px;
+      max-height: 460px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.75);
+      position: relative;
+      z-index: 1;
+    }
+
+    .poster-box.no-image .poster-image {
+      display: none;
+    }
+
+    .poster-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .06em;
+    }
+
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .type-subname {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .analysis-box h3,
+    .dim-box h3,
+    .top3-box h3,
+    .note-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .analysis-box p,
+    .note-box p {
+      margin: 0;
+      color: #304034;
+      font-size: 15px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+
+    .note-box p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .dim-list,
+    .top3-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .dim-item,
+    .top3-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .dim-item-top,
+    .top3-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dim-item-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .dim-item-score,
+    .top3-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .dim-item p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .top3-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .top3-item span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .author-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+      overflow: hidden;
+    }
+
+    .author-box summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .author-box summary::-webkit-details-marker { display: none; }
+
+    .author-box summary::after {
+      content: "展开";
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 6px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .author-box[open] summary::after {
+      content: "收起";
+    }
+
+    .author-content {
+      border-top: 1px solid var(--line);
+      padding: 0 18px 18px;
+    }
+
+    .author-content p {
+      margin: 14px 0 0;
+      color: #304034;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    @media (max-width: 860px) {
+      .hero-grid,
+      .result-top {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .shell { padding: 14px 12px 42px; }
+      .hero, .test-wrap, .result-wrap { padding: 16px; }
+      .hero h1 { font-size: 32px; }
+      .question-title { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section id="intro" class="screen active">
+      <div class="hero card">
+        <div class="eyebrow">中文说唱人格测试</div>
+        <h1>MBTI先放一边，来测你更像哪位中文说唱歌手。</h1>
+        <p class="sub">
+          这不是专业心理诊断，更像一场关于表达风格、情绪气质、社交边界和上升欲的轻量测试。
+          你可能是压场型、浪漫型、冠军脑，也可能是一种系统暂时还没归档的特别频段。
+        </p>
+        <div class="hero-actions">
+          <button id="startBtn" class="btn-primary">开始测试</button>
+        </div>
+        <div class="hero-grid">
+          <div class="mini-panel">
+            <h3>测试说明</h3>
+            <ul>
+              <li>共 30 题，选最像你的反应就行，不用做道德模范。</li>
+              <li>结果基于 15 个维度匹配，更偏风格气质，不是命运裁决书。</li>
+              <li>后续你上传歌手图片后，这一版就可以直接作为成品使用。</li>
+            </ul>
+          </div>
+          <div class="mini-panel">
+            <h3>你可能会测到</h3>
+            <ul>
+              <li>GAI、艾热 AIR、VaVa、Jony J、法老、Bridge</li>
+              <li>KEY.L、杨和苏 KeyNG、马思唯、Tizzy T</li>
+              <li>蛋堡 Soft Lipa、沙一汀EL、罗言 RollFlash、Top Barry</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="test" class="screen">
+      <div class="test-wrap card">
+        <div class="topbar">
+          <div class="progress"><span id="progressBar"></span></div>
+          <div class="progress-text" id="progressText">0 / 30</div>
+        </div>
+
+        <div id="questionList" class="question-list"></div>
+
+        <div class="actions-bottom">
+          <div class="hint" id="testHint">全选完才会放行。别让结果页一直等你开麦。</div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="backIntroBtn" class="btn-secondary">返回首页</button>
+            <button id="submitBtn" class="btn-primary" disabled>提交并查看匹配歌手</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="result" class="screen">
+      <div class="result-wrap card">
+        <div class="result-layout">
+          <div class="result-top">
+            <div class="poster-box no-image" id="posterBox">
+              <img id="posterImage" class="poster-image" alt="结果歌手海报" />
+              <div id="posterCaption" class="poster-caption">你会更像哪位中文说唱歌手？</div>
+            </div>
+
+            <div class="type-box">
+              <div class="type-kicker" id="resultModeKicker">你的匹配歌手</div>
+              <div class="type-name" id="resultTypeName">GAI（江湖型王者）</div>
+              <div class="match" id="matchBadge">匹配度 92%</div>
+              <div class="type-subname" id="resultTypeSub">你的结果副标题会显示在这里。</div>
+              <div class="tag-list" id="resultTags"></div>
+            </div>
+          </div>
+
+          <div class="analysis-box">
+            <h3>你的说唱人格解读</h3>
+            <p id="resultDesc"></p>
+          </div>
+
+          <div class="top3-box">
+            <h3>你的 Top 3 匹配歌手</h3>
+            <div id="top3List" class="top3-list"></div>
+          </div>
+
+          <div class="dim-box">
+            <h3>十五维度侧写</h3>
+            <div id="dimList" class="dim-list"></div>
+          </div>
+
+          <div class="note-box">
+            <h3>测试说明</h3>
+            <p id="funNote">本测试仅供娱乐，结果更偏向表达风格与情绪气质，不是专业心理诊断。</p>
+          </div>
+
+          <details class="author-box">
+            <summary>关于这个版本</summary>
+            <div class="author-content">
+              <p>这是一个围绕中文说唱气质做的前端测试页，保留了轻量答题和维度匹配机制，但结果、文案和展示已经全部改为歌手人格映射。</p>
+              <p>如果你后面要继续扩充歌手，只需要新增歌手资料、图片映射和 pattern，就能继续迭代。</p>
+              <p>图片位已经留好，等你上传图片后，我再帮你把路径一次性接上就行。</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="result-actions">
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="restartBtn" class="btn-secondary">重新测试</button>
+            <button id="toTopBtn" class="btn-primary">回到首页</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const dimensionMeta = {
+      S1: { name: "S1 舞台自信", model: "自我底色" },
+      S2: { name: "S2 自我轮廓", model: "自我底色" },
+      S3: { name: "S3 上升欲", model: "自我底色" },
+      E1: { name: "E1 关系安全感", model: "情感模式" },
+      E2: { name: "E2 情感投入度", model: "情感模式" },
+      E3: { name: "E3 亲密边界", model: "情感模式" },
+      A1: { name: "A1 世界滤镜", model: "态度模式" },
+      A2: { name: "A2 规则弹性", model: "态度模式" },
+      A3: { name: "A3 方向感", model: "态度模式" },
+      Ac1: { name: "Ac1 进攻欲", model: "行动驱力" },
+      Ac2: { name: "Ac2 决断度", model: "行动驱力" },
+      Ac3: { name: "Ac3 推进力", model: "行动驱力" },
+      So1: { name: "So1 开麦主动性", model: "社交模式" },
+      So2: { name: "So2 社交边界", model: "社交模式" },
+      So3: { name: "So3 表达层次", model: "社交模式" }
+    };
+
+    const questions = [
+      {
+        id: "q1", dim: "S1",
+        text: "刷到别人旅游、恋爱、实习、领奖、拍人生vlog，而你一边啃外卖一边回消息“哈哈挺好的”，此刻你内心更像哪句？",
+        options: [
+          { label: "别发了哥，我的灵魂快缩进手机壳里了。", value: 1 },
+          { label: "酸一下，但还能稳住。", value: 2 },
+          { label: "我有我的节奏，不至于当场碎掉。", value: 3 }
+        ]
+      },
+      {
+        id: "q2", dim: "S1",
+        text: "看到身边的人一个比一个会来事、会说话、会发光，你通常会？",
+        options: [
+          { label: "自动进入“我是不是来错人间了”模式。", value: 1 },
+          { label: "偶尔会比较，但也还能过。", value: 2 },
+          { label: "我承认别人厉害，但我也没那么差。", value: 3 }
+        ]
+      },
+      {
+        id: "q3", dim: "S2",
+        text: "如果深夜突然有人问你“你到底是什么样的人”，你会？",
+        options: [
+          { label: "别问了，我自己也在更新版本。", value: 1 },
+          { label: "能说一点，但说不完整。", value: 2 },
+          { label: "我大概知道自己是什么底色。", value: 3 }
+        ]
+      },
+      {
+        id: "q4", dim: "S2",
+        text: "你心里有没有那种“就算被笑也想坚持一下”的东西？",
+        options: [
+          { label: "目前比较像随机刷新。", value: 1 },
+          { label: "有一点，但不太稳定。", value: 2 },
+          { label: "有，而且我其实挺在乎它。", value: 3 }
+        ]
+      },
+      {
+        id: "q5", dim: "S3",
+        text: "看到同龄人已经开始发光发热发offer，你更接近哪种状态？",
+        options: [
+          { label: "我也想冲，但经常是思想领先行动两年。", value: 1 },
+          { label: "会着急，也会断断续续努力。", value: 2 },
+          { label: "我确实很想往上走，而且会逼自己动。", value: 3 }
+        ]
+      },
+      {
+        id: "q6", dim: "S3",
+        text: "别人对你的评价，会不会影响你第二天走路的姿势？",
+        options: [
+          { label: "会，甚至能影响我吃饭的咀嚼频率。", value: 1 },
+          { label: "看是谁说的。", value: 2 },
+          { label: "我会听，但不会被随便拿捏。", value: 3 }
+        ]
+      },
+      {
+        id: "q7", dim: "E1",
+        text: "对方六小时没回你消息，朋友圈却点赞了别人的猫，你第一反应是？",
+        options: [
+          { label: "好，原来猫比我重要，我懂了。", value: 1 },
+          { label: "开始在信任和脑补之间反复横跳。", value: 2 },
+          { label: "可能只是刚好没顾上回我。", value: 3 }
+        ]
+      },
+      {
+        id: "q8", dim: "E1",
+        text: "进入一段关系后，你会不会总担心哪天它突然散掉？",
+        options: [
+          { label: "会，我的心里常驻预警系统。", value: 1 },
+          { label: "偶尔会想，但不至于天天拉警报。", value: 2 },
+          { label: "不会，我通常先相信当下。", value: 3 }
+        ]
+      },
+      {
+        id: "q9", dim: "E2",
+        text: "你对感情的态度更像哪句？",
+        options: [
+          { label: "我可能上头过，但未必每次都那么认真。", value: 1 },
+          { label: "看状态，也看对方。", value: 2 },
+          { label: "真开始了，我一般不会当随便玩玩。", value: 3 }
+        ]
+      },
+      {
+        id: "q10", dim: "E2",
+        text: "如果你喜欢的人又体贴又好看又会说话，像命运给你开的高配体验卡，你会？",
+        options: [
+          { label: "再好我也会留一手，不可能全押。", value: 1 },
+          { label: "会心动，但还想观察观察。", value: 2 },
+          { label: "完了，我大概率会认真到有点上头。", value: 3 }
+        ]
+      },
+      {
+        id: "q11", dim: "E3",
+        text: "恋爱后，如果对方非常黏你，恨不得把你揣兜里带走，你会？",
+        options: [
+          { label: "挺好，我也想被偏爱包围。", value: 1 },
+          { label: "分情况，有时候甜有时候闷。", value: 2 },
+          { label: "请给我一点空气，我也是要呼吸的。", value: 3 }
+        ]
+      },
+      {
+        id: "q12", dim: "E3",
+        text: "在亲密关系里，“个人空间”对你来说是？",
+        options: [
+          { label: "可有可无，贴贴比较重要。", value: 1 },
+          { label: "重要，但不用天天挂嘴边。", value: 2 },
+          { label: "刚需，谁乱闯我心里会拉警戒线。", value: 3 }
+        ]
+      },
+      {
+        id: "q13", dim: "A1",
+        text: "你总体上更愿意相信：",
+        options: [
+          { label: "人心复杂，别太快交付信任。", value: 1 },
+          { label: "一半一半吧，得看运气。", value: 2 },
+          { label: "大多数人还是有基本善意的。", value: 3 }
+        ]
+      },
+      {
+        id: "q14", dim: "A1",
+        text: "你走在路上，一个很可爱的小朋友突然递给你一颗糖，你脑内弹幕更像？",
+        options: [
+          { label: "这是不是新型社会实验，我先观察。", value: 1 },
+          { label: "愣一下，再决定接不接。", value: 2 },
+          { label: "呜呜呜世界居然对我释放善意。", value: 3 }
+        ]
+      },
+      {
+        id: "q15", dim: "A2",
+        text: "第二天一早有重要课或重要会，但今晚朋友突然喊你出门吃夜宵顺便散步吹风，你会？",
+        options: [
+          { label: "走，人生就是要临时起意。", value: 1 },
+          { label: "纠结一会儿，看诱惑程度。", value: 2 },
+          { label: "不去，我明天的我会感谢现在的我。", value: 3 }
+        ]
+      },
+      {
+        id: "q16", dim: "A2",
+        text: "别人说你“别太按规矩活”，你会怎么想？",
+        options: [
+          { label: "说得对，我本来就不爱被框。", value: 1 },
+          { label: "有时想乱来，有时想稳点。", value: 2 },
+          { label: "规矩也不是坏东西，至少省事。", value: 3 }
+        ]
+      },
+      {
+        id: "q17", dim: "A3",
+        text: "做一件事之前，你通常会不会先想“我到底图什么”？",
+        options: [
+          { label: "经常没有明确目标，主打一个随缘漂流。", value: 1 },
+          { label: "有时会想，有时懒得想。", value: 2 },
+          { label: "会，我做事一般得有个方向。", value: 3 }
+        ]
+      },
+      {
+        id: "q18", dim: "A3",
+        text: "如果有人在深夜跟你说“人生其实没什么意义”，你更接近哪句？",
+        options: [
+          { label: "有点道理，我偶尔也这么虚无。", value: 1 },
+          { label: "能理解，但不想完全同意。", value: 2 },
+          { label: "再没意义也得活出点自己的意思。", value: 3 }
+        ]
+      },
+      {
+        id: "q19", dim: "Ac1",
+        text: "你做事更常见的驱动力是？",
+        options: [
+          { label: "先别出岔子，活着就行。", value: 1 },
+          { label: "既想进步，也怕翻车。", value: 2 },
+          { label: "我要的是推进、结果和升级。", value: 3 }
+        ]
+      },
+      {
+        id: "q20", dim: "Ac1",
+        text: "面对一个拖了很久的任务，你更像下面哪种人？",
+        options: [
+          { label: "先拖着，等灵感和命运一起来。", value: 1 },
+          { label: "嘴上骂两句，身体慢慢动。", value: 2 },
+          { label: "直接开工，做了再说。", value: 3 }
+        ]
+      },
+      {
+        id: "q21", dim: "Ac2",
+        text: "点奶茶时你通常是：",
+        options: [
+          { label: "在十几种口味里纠结到差点戒糖。", value: 1 },
+          { label: "会想一下，但最后能下单。", value: 2 },
+          { label: "两眼一扫，三秒决定。", value: 3 }
+        ]
+      },
+      {
+        id: "q22", dim: "Ac2",
+        text: "这题故意不给明显提示，你会？",
+        options: [
+          { label: "开始认真分析出题人是不是在玩我。", value: 1 },
+          { label: "随便猜一个，但内心有点抖。", value: 2 },
+          { label: "选完就走，不跟它纠缠。", value: 3 }
+        ]
+      },
+      {
+        id: "q23", dim: "Ac3",
+        text: "别人夸你“执行力挺强”，你内心更像哪句？",
+        options: [
+          { label: "那是被现实踹出来的，不是天赋。", value: 1 },
+          { label: "偶尔强，偶尔像没插电。", value: 2 },
+          { label: "对，事情总得有人往前推。", value: 3 }
+        ]
+      },
+      {
+        id: "q24", dim: "Ac3",
+        text: "你给自己列了计划表，结果中途冒出一堆新情况，你通常会？",
+        options: [
+          { label: "计划立得很好，下次不要再立了。", value: 1 },
+          { label: "能改就改，主打弹性生存。", value: 2 },
+          { label: "还是会尽量把它拉回正轨。", value: 3 }
+        ]
+      },
+      {
+        id: "q25", dim: "So1",
+        text: "朋友说晚上带你去认识一群新朋友，你的第一反应是？",
+        options: [
+          { label: "我先紧张一下，怕开场白都找不到。", value: 1 },
+          { label: "能聊就聊，不能聊就安静坐着。", value: 2 },
+          { label: "行啊，说不定我能把场子带热。", value: 3 }
+        ]
+      },
+      {
+        id: "q26", dim: "So1",
+        text: "聚会里来了几个你完全不认识的人，你更可能：",
+        options: [
+          { label: "先观察地形和人类，再考虑是否出声。", value: 1 },
+          { label: "谁跟我说话我就接两句。", value: 2 },
+          { label: "主动问名字，顺手把尴尬打散。", value: 3 }
+        ]
+      },
+      {
+        id: "q27", dim: "So2",
+        text: "和人相处时，你心里有没有一圈隐形安全距离？",
+        options: [
+          { label: "有，而且别人靠太近我会自动后撤。", value: 3 },
+          { label: "看人，看心情。", value: 2 },
+          { label: "没那么明显，我比较能贴近关系。", value: 1 }
+        ]
+      },
+      {
+        id: "q28", dim: "So2",
+        text: "如果遇到真正信任的人，你会不会想和对方熟到像生活搭子加灵魂股东？",
+        options: [
+          { label: "会，我其实很渴望深一点的连接。", value: 1 },
+          { label: "要看缘分和时机。", value: 2 },
+          { label: "也还好，别熟到失去边界。", value: 3 }
+        ]
+      },
+      {
+        id: "q29", dim: "So3",
+        text: "有时你明明有不同意见，却没说出口，通常是因为：",
+        options: [
+          { label: "这种情况不多，我一般会直接说。", value: 1 },
+          { label: "怕气氛尴尬，或者怕伤关系。", value: 2 },
+          { label: "不想让别人看见我心里那点阴影面。", value: 3 }
+        ]
+      },
+      {
+        id: "q30", dim: "So3",
+        text: "在不同的人面前，你会不会切换成不同版本的自己？",
+        options: [
+          { label: "不会，我基本一个模式走天下。", value: 1 },
+          { label: "会一点，但不至于完全换人。", value: 2 },
+          { label: "会，而且我很清楚自己在切。", value: 3 }
+        ]
+      }
+    ];
+
+    const RAPPER_SUBTITLE = {
+      GAI: "你的锋芒有烟火气，也有不回头的义气。",
+      AIR: "你把温柔藏进旋律，也把浪漫留给世界。",
+      VAVA: "你天生适合发光，也从不害怕被看见。",
+      JONYJ: "你把世界想得很深，所以表达总有回声。",
+      PHARAOH: "你不按套路活，却总能留下最深的记忆点。",
+      BRIDGE: "你是会把气氛点亮的人，鲜活又热烈。",
+      KEYL: "你像深夜街灯，安静、松弛，又很有故事。",
+      KEYNG: "你不是想试试看，你是真的很想赢。",
+      MASIWEI: "你把风格活成了日常，也把审美变成了武器。",
+      TIZZYT: "你看似轻快，其实一直在往更高处奔跑。",
+      SOFTLIPA: "你把细节写成诗，也把温柔留在普通生活里。",
+      SHAITING: "你轻轻说话，却总能让人心里起风。",
+      ROLLFLASH: "你擅长把情绪做成空间，让人慢慢沉进去。",
+      TOPBARRY: "你还年轻，但已经带着很强的向前感。",
+      HHHH: "你像还没被定义的混音轨，暂时不肯乖乖归类。"
+    };
+
+    const RAPPER_TAGS = {
+      GAI: ["压场感", "讲义气", "不回头"],
+      AIR: ["温柔感", "浪漫", "治愈力"],
+      VAVA: ["主角感", "自信", "锋芒"],
+      JONYJ: ["克制", "叙事感", "后劲"],
+      PHARAOH: ["反差感", "想象力", "记忆点"],
+      BRIDGE: ["热场", "鲜活", "外放"],
+      KEYL: ["松弛", "生活感", "故事性"],
+      KEYNG: ["目标感", "爆发力", "胜负欲"],
+      MASIWEI: ["审美", "风格化", "从容"],
+      TIZZYT: ["少年感", "上升感", "轻盈野心"],
+      SOFTLIPA: ["细腻", "温柔", "观察力"],
+      SHAITING: ["敏感", "少年感", "共鸣"],
+      ROLLFLASH: ["氛围感", "迷离", "情绪流动"],
+      TOPBARRY: ["新锐", "速度感", "冲劲"],
+      HHHH: ["混频", "未定义", "开放型"]
+    };
+
+    const TYPE_LIBRARY = {
+      GAI: {
+        code: "GAI",
+        cn: "江湖型王者",
+        intro: "你不是在做选择，你是在定规矩。",
+        desc: "你匹配到的说唱歌手原型是 GAI。你身上最动人的地方，从来不只是锋利，而是一种带着烟火气的压场感。你像一把收在鞘里的刀，平时不必多说，真正开口时却自有分量。你的情绪很少散落成零碎的抱怨，而更像一句掷地有声的判断。别人先记住你的硬，再慢慢看见你的义气、护短和不肯回头的认真。你不是轻飘飘地活着的人，你走过的地方，总会留下态度。"
+      },
+      AIR: {
+        code: "AIR",
+        cn: "浪漫型治愈者",
+        intro: "你表面松弛，内里其实很有温度。",
+        desc: "你匹配到的说唱歌手原型是 艾热 AIR。你像那种会把情绪酿成晚风的人，不喧哗，却总能慢慢吹进别人心里。你不靠锋芒取胜，而靠柔软、审美和一种不动声色的陪伴感打动人。你愿意去感受世界的粗粝，也愿意替生活留下一点光，所以你身上常常有一种很自然的浪漫。你不是最吵的那个人，却很容易成为最让人想靠近的人。"
+      },
+      VAVA: {
+        code: "VAVA",
+        cn: "飒感型主角",
+        intro: "你不是想被看见，你是天生就很显眼。",
+        desc: "你匹配到的说唱歌手原型是 VaVa。你像一束自带棱角的灯，站在那里就已经足够夺目。你很清楚自己要什么，也不太会为了让别人舒服而刻意磨平自己。你的气质不是虚张声势的高调，而是一种很利落的笃定。你有主角感，也有边界感，表达自我时漂亮、直接、干净。你不是来配合气氛的，你更像那个让气氛开始转向你的人。"
+      },
+      JONYJ: {
+        code: "JONYJ",
+        cn: "克制型叙事者",
+        intro: "你看起来话不多，但脑子里一直有完整的故事线。",
+        desc: "你匹配到的说唱歌手原型是 Jony J。你像一条慢慢流的河，不急着翻涌，却始终有自己的方向。你擅长把经验、城市、旧事和心事一点点沉进语言里，让表达带着时间的重量。你不喜欢廉价的宣泄，更愿意把世界拆开，安静地讲给真正听得懂的人。你的魅力不在喧哗，而在后劲。很多人不会第一秒被你击中，但会在回头时突然觉得你留得特别深。"
+      },
+      PHARAOH: {
+        code: "PHARAOH",
+        cn: "疯感型表达者",
+        intro: "你不一定循规蹈矩，但一定足够有记忆点。",
+        desc: "你匹配到的说唱歌手原型是 法老。你像一场突然转向的梦，荒诞、炽热、难以预测，却偏偏真实得让人心里一震。你很难被整齐地归类，因为你本来就不是为模板而生的人。你有强烈的表达欲，也有把情绪推到更极端位置的天赋。别人先被你的怪和疯吸引，后来才发现那些看似跳脱的语言下面，其实藏着特别赤裸的真诚。"
+      },
+      BRIDGE: {
+        code: "BRIDGE",
+        cn: "热场型快乐源",
+        intro: "你的人格关键词不是端着，而是有活人感。",
+        desc: "你匹配到的说唱歌手原型是 Bridge。你像一阵会自己起节奏的风，走到哪里，哪里就会热起来。你身上有一种难以伪装的鲜活感，热闹、外放、带一点孩子气，也带一点不服输的冲劲。你很会把能量分给别人，让沉闷的场子重新亮起来。和你在一起的人，未必记得你说了多少大道理，但会记得你把空气都点亮过。"
+      },
+      KEYL: {
+        code: "KEYL",
+        cn: "松弛型街区诗人",
+        intro: "你不是没锋芒，你只是习惯用更松弛的方式表达。",
+        desc: "你匹配到的说唱歌手原型是 KEY.L 刘聪。你像深夜车窗外一闪而过的街灯，不刺眼，却很有故事。你不急着证明自己，也不喜欢把情绪做得太满；你更擅长把生活的褶皱、关系的温度和漂泊的时刻轻轻写下来。你的吸引力来自自然，来自松弛，来自一种见过很多事情以后仍愿意认真感受的状态。别人靠近你时，不会先被震到，而是会慢慢沉进去。"
+      },
+      KEYNG: {
+        code: "KEYNG",
+        cn: "燃战型冠军脑",
+        intro: "你不是普通的好胜，你是真的很想赢。",
+        desc: "你匹配到的说唱歌手原型是 杨和苏 KeyNG。你像一团不愿熄灭的火，平时安静，一到关键时刻就会把全部能量推到最前面。你不太会满足于差不多，你更像那种总想再往前一点、再高一点、再强一点的人。你身上有明确的目标感，也有不肯退让的执行力。你不是单纯想证明自己，你是想把属于自己的位置亲手拿回来。"
+      },
+      MASIWEI: {
+        code: "MASIWEI",
+        cn: "潮流型策展人",
+        intro: "你很懂怎么把品味、脑子和存在感同时摆上台面。",
+        desc: "你匹配到的说唱歌手原型是 马思唯。你像一场布置得很漂亮的夜晚，灯光、语气、节奏与品味都在你的掌控之中。你不只是会表达，更会经营表达；你知道什么样的风格适合自己，也知道怎样把生活方式变成一种让人记住的存在感。你既有审美，也有脑子，既能轻巧地讲态度，也能把自己活成一个完整的风格现场。"
+      },
+      TIZZYT: {
+        code: "TIZZYT",
+        cn: "少年感野心家",
+        intro: "你看起来轻松，但其实一直在往更高处走。",
+        desc: "你匹配到的说唱歌手原型是 Tizzy T。你像一辆看起来轻，却始终在提速的车。你给人的第一感觉常常是顺滑、年轻、时髦，带一点好像什么都不太费力的松弛感，但真正了解你的人会知道，你其实一直很想往上走。你不仅有野心，也有柔软的一面。你会向前冲，也会认真爱；会追更高处，也会记得回头看身边的人。"
+      },
+      SOFTLIPA: {
+        code: "SOFTLIPA",
+        cn: "温柔型生活观察家",
+        intro: "你不靠大声证明自己，你靠细节让人记住。",
+        desc: "你匹配到的说唱歌手原型是 蛋堡 Soft Lipa。你像一张缓慢曝光的底片，刚看时安静，回头想却会发现里面藏了很多情绪和细节。你不习惯用很强烈的方式争夺注意力，你更擅长把生活切成很小的片段，再轻轻放进语言里。你的魅力在于，你能把那些别人来不及说出口的感受，慢慢说得刚刚好。"
+      },
+      SHAITING: {
+        code: "SHAITING",
+        cn: "脆感型少年诗人",
+        intro: "你很像那种嘴上轻轻带过，心里其实早就翻江倒海的人。",
+        desc: "你匹配到的说唱歌手原型是 沙一汀EL。你像雨还没落下来的傍晚，表面安静，空气里却已经满是情绪。你身上有很明显的少年感、真诚感和一点不肯把脆弱彻底说透的倔强。你很适合把喜欢、遗憾、成长和错过这些不太容易直说的情绪，绕进旋律里，再轻轻唱出来。你总会让人想到晚风、旧站台、散场后的路灯，以及那些没说完的话。"
+      },
+      ROLLFLASH: {
+        code: "ROLLFLASH",
+        cn: "氛围型情绪导演",
+        intro: "你擅长的不是把情绪说破，而是把情绪做成空间感。",
+        desc: "你匹配到的说唱歌手原型是 罗言 RollFlash。你像一间开着昏黄灯光的房间，门没有锁，风却一直在吹。你不一定会把情绪讲得特别直接，但你很会制造感觉，让人一步一步走进你的氛围里。你的表达不是冲撞型的，而是渗透型的；不是喊出来的，而是慢慢包围过来的。你很适合深夜，也很适合耳机。"
+      },
+      TOPBARRY: {
+        code: "TOPBARRY",
+        cn: "新锐型冲线选手",
+        intro: "你最像那种年纪不大，但已经很想跑到前面去的人。",
+        desc: "你匹配到的说唱歌手原型是 Top Barry。你像刚刚起跑的年轻风，方向明确，速度很快，身上还带着一点谁也没来得及磨掉的锐气。你不是那种会反复权衡很多次的人，你更像看准了就立刻往前冲的人。但在这种冲劲之外，你也有很明显的青春式心动和不稳定的浪漫。你还在长大，也还在迅速发亮。"
+      },
+      HHHH: {
+        code: "HHHH",
+        cn: "未定义型听感体",
+        intro: "你的气质很难被一首歌完整概括。",
+        desc: "你的维度组合比较特别，系统暂时没有把你稳定收进某一位歌手的风格盒子里。你可能同时拥有几种截然不同的表达方式：一部分想燃，一部分想躲，一部分要浪漫，一部分又偏冷静。所以与其说你没有答案，不如说你还在形成自己的声线。这个结果不是空白，而是开放。它更像一张还没完全落墨的唱片封面，等着被你亲自写上名字。"
+      }
+    };
+
+    const TYPE_IMAGES = {
+  GAI: "./image2/gai.jpg",
+  AIR: "./image2/air.jpg",
+  VAVA: "./image2/vava.jpg",
+  JONYJ: "./image2/jonyj.jpg",
+  PHARAOH: "./image2/pharaoh.jpg",
+  BRIDGE: "./image2/bridge.jpg",
+  KEYL: "./image2/keyl.jpg",
+  KEYNG: "./image2/keyng.jpg",
+  MASIWEI: "./image2/masiwei.jpg",
+  TIZZYT: "./image2/tizzyt.jpg",
+  SOFTLIPA: "./image2/softlipa.jpg",
+  SHAITING: "./image2/shaiting.jpg",
+  ROLLFLASH: "./image2/rollflash.jpg",
+  TOPBARRY: "./image2/topbarry.jpg",
+  HHHH: "./image2/hhhh.jpg"
+    };
+
+    const NORMAL_TYPES = [
+      { code: "GAI", pattern: "HHH-HMM-MMH-HHH-MLL" },
+      { code: "AIR", pattern: "MMH-HHH-HMH-MMM-MHL" },
+      { code: "VAVA", pattern: "HHH-HMH-HMH-HMH-HLH" },
+      { code: "JONYJ", pattern: "HHH-MMM-MHH-MHM-LMH" },
+      { code: "PHARAOH", pattern: "MHM-MMH-LMH-HML-HMH" },
+      { code: "BRIDGE", pattern: "MHH-HMH-MMM-HMH-HLL" },
+      { code: "KEYL", pattern: "MMH-MMM-MMH-MMM-LMH" },
+      { code: "KEYNG", pattern: "HHH-MMH-HMH-HHH-MLL" },
+      { code: "MASIWEI", pattern: "HHH-MMH-MMH-HMH-HMH" },
+      { code: "TIZZYT", pattern: "HMH-HMH-HMH-HMH-MMH" },
+      { code: "SOFTLIPA", pattern: "MMH-MHH-MMH-MMM-MLH" },
+      { code: "SHAITING", pattern: "MLH-LHH-HMH-MLM-MLH" },
+      { code: "ROLLFLASH", pattern: "MMH-MMH-HMH-MLM-MMH" },
+      { code: "TOPBARRY", pattern: "HMH-MMH-HMH-HMH-HMH" }
+    ];
+
+    const DIM_EXPLANATIONS = {
+      S1: {
+        L: "你比较容易被外界亮度晃到眼，别人一发光，你内心就先想关静音。",
+        M: "你会比较，但不至于场场都被打散，自尊值处于可波动状态。",
+        H: "你对自己基本有数，别人再闪，你也不至于当场掉拍。"
+      },
+      S2: {
+        L: "你像还在反复混音的人，知道自己有内容，但版本还没完全定稿。",
+        M: "你有轮廓，只是偶尔会被情绪抢走主麦。",
+        H: "你对自己是什么路数、什么底色、什么边界，大体都挺清楚。"
+      },
+      S3: {
+        L: "你也想往前，但常常是理想先上高速，身体还在找鞋。",
+        M: "你有上升心，也会摆一摆，动力和松弛经常轮流坐庄。",
+        H: "你对变强、变好、变有存在感这件事，是真的上心。"
+      },
+      E1: {
+        L: "关系里你的雷达比较灵，一点风吹草动都可能脑补到彩蛋结局。",
+        M: "你会怀疑，也会劝自己别乱想，内心常在拉扯。",
+        H: "你更愿意先信任关系本身，不会被一点小动静立刻震翻。"
+      },
+      E2: {
+        L: "你不是不心动，只是不会轻易把全部筹码都推上桌。",
+        M: "你会投入，但通常保留一点理智给明天的自己。",
+        H: "一旦认真，你给情绪和精力都挺足，主打一个真投。"
+      },
+      E3: {
+        L: "你挺在意亲密感，关系热一点，你会更安心。",
+        M: "你想靠近，也想留缝，属于可调节型亲密选手。",
+        H: "你需要明确的空间和边界，不然心里会先自动后撤。"
+      },
+      A1: {
+        L: "你看世界会先带一点防御镜片，信任从来不是秒过。",
+        M: "你既不完全乐观，也不彻底悲观，观望是你的默认设置。",
+        H: "你更愿意相信善意还在，这让你看世界时不至于太冷。"
+      },
+      A2: {
+        L: "你对规则的态度是：能变通就别太早认输。",
+        M: "你时而想稳，时而想浪，主打一个临场平衡。",
+        H: "你比较重视秩序和节奏，能别炸流程就尽量别炸。"
+      },
+      A3: {
+        L: "你有时会觉得很多事都像路过，意义感不是天天满格。",
+        M: "你偶尔很有方向，偶尔也想随波逐流，属于半开机状态。",
+        H: "你做事通常希望有个去处，不太喜欢空转。"
+      },
+      Ac1: {
+        L: "你做事先想别翻车，安全感往往比野心更早开机。",
+        M: "你既想赢，也会怕麻烦，驱动力比较混合。",
+        H: "你很容易被推进感、成长感和结果感点燃。"
+      },
+      Ac2: {
+        L: "你做决定前容易多开几个脑内会议，拖延并不全是摆烂。",
+        M: "你会犹豫，但通常还能在死机前下决定。",
+        H: "你拍板速度比较快，选完就走，不太爱回头磨。"
+      },
+      Ac3: {
+        L: "你的执行力有时得靠现实踹一脚，才能正式上线。",
+        M: "你能做，但状态很看时机，偶尔稳偶尔飘。",
+        H: "你推进事情的意愿挺强，不落地会一直在心里挂着。"
+      },
+      So1: {
+        L: "你社交起手偏慢热，新场子里通常先看人再开口。",
+        M: "你不是完全被动，也不是一定抢麦，属于弹性选手。",
+        H: "你很能主动打开局面，尴尬到你这儿容易被化掉。"
+      },
+      So2: {
+        L: "你对深连接其实有期待，熟了以后会愿意往里走很多。",
+        M: "你的边界感看对象切换，不是一刀切，也不是完全敞开。",
+        H: "你的安全距离感比较明确，人太近时你会先本能后撤。"
+      },
+      So3: {
+        L: "你更偏直接表达，心里有啥一般不太爱藏太多层。",
+        M: "你会顾场面，也会留一点真心，表达上比较平衡。",
+        H: "你很会分场合切版本，真实感会按对象和环境分层释放。"
+      }
+    };
+
+    const dimensionOrder = ["S1", "S2", "S3", "E1", "E2", "E3", "A1", "A2", "A3", "Ac1", "Ac2", "Ac3", "So1", "So2", "So3"];
+
+    const app = {
+      shuffledQuestions: [],
+      answers: {}
+    };
+
+    const screens = {
+      intro: document.getElementById("intro"),
+      test: document.getElementById("test"),
+      result: document.getElementById("result")
+    };
+
+    const questionList = document.getElementById("questionList");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const submitBtn = document.getElementById("submitBtn");
+    const testHint = document.getElementById("testHint");
+
+    function showScreen(name) {
+      Object.entries(screens).forEach(([key, el]) => {
+        el.classList.toggle("active", key === name);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function levelNum(level) {
+      return { L: 1, M: 2, H: 3 }[level];
+    }
+
+    function sumToLevel(score) {
+      if (score <= 3) return "L";
+      if (score === 4) return "M";
+      return "H";
+    }
+
+    function parsePattern(pattern) {
+      return pattern.replace(/-/g, "").split("");
+    }
+
+    function renderQuestions() {
+      questionList.innerHTML = "";
+      app.shuffledQuestions.forEach((q, index) => {
+        const card = document.createElement("article");
+        card.className = "question";
+        card.innerHTML = `
+          <div class="question-meta">
+            <div class="badge">第 ${index + 1} 题</div>
+            <div>维度已隐藏</div>
+          </div>
+          <div class="question-title">${q.text}</div>
+          <div class="options">
+            ${q.options.map((opt, i) => `
+              <label class="option">
+                <input type="radio" name="${q.id}" value="${opt.value}" ${app.answers[q.id] === opt.value ? "checked" : ""} />
+                <div class="option-code">${["A", "B", "C", "D"][i] || String(i + 1)}</div>
+                <div>${opt.label}</div>
+              </label>
+            `).join("")}
+          </div>
+        `;
+        questionList.appendChild(card);
+      });
+
+      questionList.querySelectorAll('input[type="radio"]').forEach((input) => {
+        input.addEventListener("change", (e) => {
+          const { name, value } = e.target;
+          app.answers[name] = Number(value);
+          updateProgress();
+        });
+      });
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const total = app.shuffledQuestions.length;
+      const done = app.shuffledQuestions.filter((q) => app.answers[q.id] !== undefined).length;
+      const percent = total ? (done / total) * 100 : 0;
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = `${done} / ${total}`;
+      const complete = done === total && total > 0;
+      submitBtn.disabled = !complete;
+      testHint.textContent = complete
+        ? "都做完了。现在可以把你的电子魂魄交给结果页审判。"
+        : "全选完才会放行。别让结果页一直等你开麦。";
+    }
+
+    function computeResult() {
+      const rawScores = {};
+      const levels = {};
+      Object.keys(dimensionMeta).forEach((dim) => { rawScores[dim] = 0; });
+
+      questions.forEach((q) => {
+        rawScores[q.dim] += Number(app.answers[q.id] || 0);
+      });
+
+      Object.entries(rawScores).forEach(([dim, score]) => {
+        levels[dim] = sumToLevel(score);
+      });
+
+      const userVector = dimensionOrder.map((dim) => levelNum(levels[dim]));
+      const ranked = NORMAL_TYPES.map((type) => {
+        const vector = parsePattern(type.pattern).map(levelNum);
+        let distance = 0;
+        let exact = 0;
+        for (let i = 0; i < vector.length; i++) {
+          const diff = Math.abs(userVector[i] - vector[i]);
+          distance += diff;
+          if (diff === 0) exact += 1;
+        }
+        const similarity = Math.max(0, Math.round((1 - distance / 30) * 100));
+        return {
+          ...type,
+          ...TYPE_LIBRARY[type.code],
+          distance,
+          exact,
+          similarity
+        };
+      }).sort((a, b) => {
+        if (a.distance !== b.distance) return a.distance - b.distance;
+        if (b.exact !== a.exact) return b.exact - a.exact;
+        return b.similarity - a.similarity;
+      });
+
+      const bestNormal = ranked[0];
+      let finalType = bestNormal;
+      let modeKicker = "你的匹配歌手";
+      let badge = `匹配度 ${bestNormal.similarity}% · 精准命中 ${bestNormal.exact}/15 维`;
+      let sub = RAPPER_SUBTITLE[bestNormal.code] || "这个结果会更接近你当下的表达方式、情绪气质和关系风格。";
+      let special = false;
+
+      if (bestNormal.similarity < 55) {
+        finalType = TYPE_LIBRARY.HHHH;
+        modeKicker = "系统兜底结果";
+        badge = `最高匹配度 ${bestNormal.similarity}%`;
+        sub = RAPPER_SUBTITLE.HHHH;
+        special = true;
+      }
+
+      return {
+        rawScores,
+        levels,
+        ranked,
+        finalType,
+        modeKicker,
+        badge,
+        sub,
+        special
+      };
+    }
+
+    function renderDimList(result) {
+      const dimList = document.getElementById("dimList");
+      dimList.innerHTML = dimensionOrder.map((dim) => `
+        <div class="dim-item">
+          <div class="dim-item-top">
+            <div class="dim-item-name">${dimensionMeta[dim].name}</div>
+            <div class="dim-item-score">${result.levels[dim]} / ${result.rawScores[dim]}分</div>
+          </div>
+          <p>${DIM_EXPLANATIONS[dim][result.levels[dim]]}</p>
+        </div>
+      `).join("");
+    }
+
+    function renderTop3(result) {
+      const top3List = document.getElementById("top3List");
+      top3List.innerHTML = result.ranked.slice(0, 3).map((item, index) => `
+        <div class="top3-item">
+          <div>
+            <strong>${index + 1}. ${item.code}（${item.cn}）</strong>
+            <span>${RAPPER_SUBTITLE[item.code] || item.intro}</span>
+          </div>
+          <div class="top3-score">${item.similarity}%</div>
+        </div>
+      `).join("");
+    }
+
+    function renderTags(typeCode) {
+      const resultTags = document.getElementById("resultTags");
+      const tags = RAPPER_TAGS[typeCode] || [];
+      resultTags.innerHTML = tags.map((tag) => `<span class="tag">${tag}</span>`).join("");
+    }
+
+    function renderResult() {
+      const result = computeResult();
+      const type = result.finalType;
+
+      document.getElementById("resultModeKicker").textContent = result.modeKicker;
+      document.getElementById("resultTypeName").textContent = `${type.code}（${type.cn}）`;
+      document.getElementById("matchBadge").textContent = result.badge;
+      document.getElementById("resultTypeSub").textContent = result.sub;
+      document.getElementById("resultDesc").textContent = type.desc;
+      document.getElementById("posterCaption").textContent = type.intro;
+      document.getElementById("funNote").textContent = result.special
+        ? "本测试仅供娱乐。你的维度组合比较少见，所以系统给了一个开放型结果；它更像气质参考，不是绝对定义。"
+        : "本测试仅供娱乐，结果更偏向表达风格、情绪气质和社交状态，而不是专业心理诊断。";
+
+      renderTags(type.code);
+      renderTop3(result);
+      renderDimList(result);
+
+      const posterBox = document.getElementById("posterBox");
+      const posterImage = document.getElementById("posterImage");
+      const imageSrc = TYPE_IMAGES[type.code];
+      if (imageSrc) {
+        posterImage.src = imageSrc;
+        posterImage.alt = `${type.code}（${type.cn}）`;
+        posterBox.classList.remove("no-image");
+      } else {
+        posterImage.removeAttribute("src");
+        posterImage.alt = "";
+        posterBox.classList.add("no-image");
+      }
+
+      showScreen("result");
+    }
+
+    function startTest() {
+      app.answers = {};
+      app.shuffledQuestions = shuffle(questions);
+      renderQuestions();
+      showScreen("test");
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startTest);
+    document.getElementById("backIntroBtn").addEventListener("click", () => showScreen("intro"));
+    document.getElementById("submitBtn").addEventListener("click", renderResult);
+    document.getElementById("restartBtn").addEventListener("click", startTest);
+    document.getElementById("toTopBtn").addEventListener("click", () => showScreen("intro"));
+  </script>
+</body>
+</html>
